@@ -30,17 +30,22 @@ server:
 #  security:
 #    enabled: false
 
+
 #filter測試
 spring:
+  profiles:
+    active: add_request_header_route
   cloud:
     gateway:
       routes:
         - id: add_request_header_route
-          uri: https://github.com/
+          uri: http://localhost:8090
+#          uri: https://www.gamer.com.tw/
+          predicates:
+            - Path=/aa/**
           filters:
             - AddRequestHeader=X-Request-Foo, Bar
-          predicates:
-            - Method=GET
+            - RewritePath=/aa/(?<segment>.*), /$\{segment}
 
 #印出log
 logging:

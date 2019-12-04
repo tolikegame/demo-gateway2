@@ -2,6 +2,9 @@ package com.example.gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.gateway.route.RouteLocator;
+import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
+import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class GatewayApplication {
@@ -79,12 +82,25 @@ public class GatewayApplication {
 //                .build();
 //    }
 
+
+//    @Bean
+//    public RouteLocator routeLocator(RouteLocatorBuilder builder) {
+//        return builder.routes()
+//                .route(r -> r.path("/get")
+//                        .filters(gatewayFilterSpec -> gatewayFilterSpec.stripPrefix(1)
+//                                .addRequestHeader("MY_HEADER", "lpw")
+//                                .addRequestParameter("MY_PARAM", "test")
+//                        )
+//                        .uri("http://localhost:8090"))
+//                .build();
+//    }
+
 //    @Bean
 //    public RouteLocator testRouteLocator(RouteLocatorBuilder builder) {
 //        return builder.routes()
 //                .route("add_request_header_route", r ->
 //                        r.path("/test").filters(f -> f.addRequestHeader("X-Request-Foo", "Bar"))
-//                                .uri("http://localhost:8090/test/head"))
+//                                .uri("http://localhost:8090/test/head/"))
 //                .build();
 //    }
 
@@ -94,6 +110,15 @@ public class GatewayApplication {
 //                .route("add_request_parameter_route", r ->
 //                        r.path("/addRequestParameter").filters(f -> f.addRequestParameter("example", "ValueB"))
 //                                .uri("http://localhost:8090/test/addRequestParameter"))
+//                .build();
+//    }
+
+//    @Bean
+//    public RouteLocator testRouteLocator(RouteLocatorBuilder builder) {
+//        return builder.routes()
+//                .route("rewritepath_route", r ->
+//                        r.path("/foo/**").filters(f -> f.rewritePath("/foo/(?<segment>.*)","/$\\{segment}"))
+//                                .uri("http://www.baidu.com"))
 //                .build();
 //    }
 
