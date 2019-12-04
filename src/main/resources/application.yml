@@ -1,0 +1,50 @@
+server:
+  port: 8080
+
+#spring:
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: first_route #自訂路由id，唯一鍵
+#          uri: https://github.com/ #目標服務網址
+#          predicates:
+#            - Path=/features #路徑
+#            - Path=/foo/{segment} #{segment}任填
+#            - After=2018-01-20T06:06:06+08:00[Asia/Shanghai] #2018年1月20日6點6分6秒[亞洲/上海]
+#            - Before=2020-01-20T06:06:06+08:00 #也可以不用輸入地區
+#            - Between=2018-01-20T06:06:06+08:00, 2020-01-20T06:06:06+08:00
+#            - Cookie=QwQ, ouo.k #cookie設定，用postman測試要寫在Headers上
+#            - Header=X-Request-Id, \d+ #任意數字
+#            - Header=X-Request-Id, abc
+#            - Host=**.github.com #寫在Header配置
+#            - Method=GET #已確定可以進行"限制"Method訪問，但是設定的Method只有GET可以成功進行訪問
+#            - Query=YUY #設定Key,Value，可以只設定Key
+#            - Query=O3O,123 #兩種則一設定，如果兩種都一起設定表示兩種參數都要帶
+
+#開啟端點
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: '*'
+#  security:
+#    enabled: false
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: add_request_header_route
+          uri: https://github.com/
+          filters:
+            - AddRequestHeader=X-Request-Foo, Bar
+          predicates:
+            - Method=GET
+
+
+logging:
+  level:
+    org.springframework.cloud.gateway: TRACE
+    org.springframework.http.server.reactive: DEBUG
+    org.springframework.web.reactive: DEBUG
+    reactor.ipc.netty: DEBUG
