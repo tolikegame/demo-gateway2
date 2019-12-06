@@ -62,6 +62,16 @@ public class TestController {
 		return "重试"+count+"次成功！";
 	}
 
+	@GetMapping("/retry2")
+	public String retry2(){
+		AtomicInteger num = new AtomicInteger();
+		//重試超過設定的次數才會拋出Exception!!
+		if (true) {
+			throw new RuntimeException("error");
+		}
+		return "test"+num;
+	}
+
 
 	/**
 	 * @param request

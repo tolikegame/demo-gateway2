@@ -1,10 +1,12 @@
 package com.example.gateway;
 
+import com.example.gateway.filter.CustomGatewayFilter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpStatus;
 
 @SpringBootApplication
 public class GatewayApplication {
@@ -12,6 +14,8 @@ public class GatewayApplication {
     public static void main(String[] args) {
         SpringApplication.run(GatewayApplication.class, args);
     }
+
+    //Predicates~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //    @Bean
 //    public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
@@ -82,25 +86,15 @@ public class GatewayApplication {
 //                .build();
 //    }
 
-
-//    @Bean
-//    public RouteLocator routeLocator(RouteLocatorBuilder builder) {
-//        return builder.routes()
-//                .route(r -> r.path("/get")
-//                        .filters(gatewayFilterSpec -> gatewayFilterSpec.stripPrefix(1)
-//                                .addRequestHeader("MY_HEADER", "lpw")
-//                                .addRequestParameter("MY_PARAM", "test")
-//                        )
-//                        .uri("http://localhost:8090"))
-//                .build();
-//    }
+    //Filter~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 //    @Bean
 //    public RouteLocator testRouteLocator(RouteLocatorBuilder builder) {
 //        return builder.routes()
 //                .route("add_request_header_route", r ->
-//                        r.path("/test").filters(f -> f.addRequestHeader("X-Request-Foo", "Bar"))
-//                                .uri("http://localhost:8090/test/head/"))
+//                        r.path("/aa/**").filters(f -> f.addRequestHeader("X-Request-Foo", "Bar")
+//                        .rewritePath("/aa/(?<segment>.*)","/$\\{segment}"))
+//                                .uri("http://localhost:8090"))
 //                .build();
 //    }
 
@@ -108,8 +102,9 @@ public class GatewayApplication {
 //    public RouteLocator testRouteLocator(RouteLocatorBuilder builder) {
 //        return builder.routes()
 //                .route("add_request_parameter_route", r ->
-//                        r.path("/addRequestParameter").filters(f -> f.addRequestParameter("example", "ValueB"))
-//                                .uri("http://localhost:8090/test/addRequestParameter"))
+//                        r.path("/aa/**").filters(f -> f.addRequestParameter("example", "OwO")
+//                                .rewritePath("/aa/(?<segment>.*)","/$\\{segment}"))
+//                                .uri("http://localhost:8090"))
 //                .build();
 //    }
 
@@ -118,8 +113,34 @@ public class GatewayApplication {
 //        return builder.routes()
 //                .route("rewritepath_route", r ->
 //                        r.path("/foo/**").filters(f -> f.rewritePath("/foo/(?<segment>.*)","/$\\{segment}"))
-//                                .uri("http://www.baidu.com"))
+//                                .uri("http://www.github.com"))
 //                .build();
 //    }
+
+//    @Bean
+//    public RouteLocator retryRouteLocator(RouteLocatorBuilder builder) {
+//        return builder.routes()
+//                .route("retry_route", r -> r.path("/aa/**")
+//                        .filters(f ->f.retry(config -> config.setRetries(2).setStatuses(HttpStatus.INTERNAL_SERVER_ERROR))
+//                                .rewritePath("/aa/(?<segment>.*)","/$\\{segment}")
+//                        .addRequestParameter("key","abc")
+//                        .addRequestParameter("count","2"))
+//                        .uri("http://localhost:8090"))
+//                .build();
+//    }
+
+    @Bean
+    public RouteLocator customerRouteLocator(RouteLocatorBuilder builder) {
+        return builder.routes()
+                .route(r -> r.path("/aa/**")
+                        .filters(f -> f.addRequestParameter("name","QwQ")
+                                .rewritePath("/aa/(?<segment>.*)","/$\\{segment}")
+                                .filter(new CustomGatewayFilter()))
+                        .uri("http://localhost:8090")
+                        .order(0)
+                        .id("custom_filter")
+                )
+                .build();
+    }
 
 }
