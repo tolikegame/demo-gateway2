@@ -3,16 +3,24 @@ package com.example.gateway;
 import com.example.gateway.filter.CustomGatewayFilter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
 public class GatewayApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(GatewayApplication.class, args);
+    }
+
+    @Bean
+    @LoadBalanced
+    public RestTemplate restTemplate(){
+        return new RestTemplate();
     }
 
     //Predicates~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -132,15 +140,34 @@ public class GatewayApplication {
     @Bean
     public RouteLocator customerRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
-                .route(r -> r.path("/aa/**")
-                        .filters(f -> f.addRequestParameter("name","QwQ")
-                                .rewritePath("/aa/(?<segment>.*)","/$\\{segment}")
-                                .filter(new CustomGatewayFilter()))
-                        .uri("http://localhost:8090")
-                        .order(0)
-                        .id("custom_filter")
+                .route(r -> r.path("/test/**")
+                                .filters(f -> f.addRequestParameter("name","QwQ")
+                                        .rewritePath("/test/(?<segment>.*)","/$\\{segment}")
+                                        .filter(new CustomGatewayFilter()))
+
+//                        .filters(f -> f.filter(new CustomGatewayFilter()))    //
+//                                .uri("http://localhost:8090")
+                                .uri("lb://server-provider")
+                                .order(0)
+                                .id("custom_filter")
                 )
                 .build();
     }
+
+//    @Bean
+//    public RouteLocator customerRouteLocator(RouteLocatorBuilder builder) {
+//        return builder.routes()
+//                .route(r -> r.path("/test/**")
+//                                .filters(f -> f.addRequestParameter("name","QwQ")
+//                                        .rewritePath("/test/(?<segment>.*)","/$\\{segment}")
+//                                        .filter(new CustomGatewayFilter()))
+//
+////                        .filters(f -> f.filter(new CustomGatewayFilter()))    //
+//                                .uri("lb://server-provider")
+//                                .order(0)
+//                                .id("custom_filter")
+//                )
+//                .build();
+//    }
 
 }

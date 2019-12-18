@@ -5,15 +5,20 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.core.Ordered;
+import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+
+import java.util.logging.Logger;
 
 /**
  * 统计某个或者某种路由的的处理时长
  * @author xujin
  */
+@Component
 public class CustomGatewayFilter implements GatewayFilter, Ordered {
 
+    private static final Logger LOGGER = Logger.getLogger(String.valueOf(CustomGatewayFilter.class));
     private static final Log log = LogFactory.getLog(GatewayFilter.class);
     private static final String COUNT_Start_TIME = "countStartTime";
 

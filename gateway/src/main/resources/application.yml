@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8888
 
 #spring:
 #  cloud:
@@ -39,7 +39,8 @@ spring:
     gateway:
       routes:
         - id: add_request_header_route
-          uri: http://localhost:8090
+#          uri: http://localhost:8090
+          uri: lb://server-provider
 #          uri: https://www.gamer.com.tw/
           predicates:
             - Path=/aa/**  #要連到其他微服務的Mapping網址上，需要寫成/**
@@ -56,6 +57,9 @@ spring:
                 statuses: INTERNAL_SERVER_ERROR  #series跟statuses就是狀態碼跟狀態訊息，擇一即可
 #                methods: GET  #預設為GET
 #                exceptions: java.io.IOException #指定哪些異常需要重試，預設為
+  application:
+    name: gateway
+
 
 #印出log
 logging:
@@ -64,3 +68,30 @@ logging:
     org.springframework.http.server.reactive: DEBUG
     org.springframework.web.reactive: DEBUG
     reactor.ipc.netty: DEBUG
+
+#eureka配置-可用可不用，引用spring-cloud-starter-netflix-eureka-client可以自動註冊發現服務
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: http://${eureka.host:127.0.0.1}:${eureka.port:8761}/eureka/
+#  instance:
+#    prefer-ip-address: true
+
+#配置文件優先級高於使用JPA註解
+
+#Ribbon超時與重試
+server-provider:  #artifactId名稱(Module)
+  ribbon:
+#    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule  #負載均衡策略-隨機選擇Server
+    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RoundRobinRule  #負載均衡策略-順序選擇Server(預設為此策略)
+    ConnectTimeout: 3000 #服务请求连接超时时间（毫秒）
+    ReadTimeout: 3000 #服务请求处理超时时间（毫秒）
+    MaxAutoRetries: 1 #对第一次请求的服务的重试次数
+    MaxAutoRetriesNextServer: 1 #要重试的下一个服务的最大数量（不包括第一个服务）
+    OkToRetryOnAllOperations: true #对超时请求启用重试机制
+
+##Ribbon飢餓加載->ribbon接到請求才會創建，飢餓加載是啟動時便會加載
+#ribbon:
+#  eager-load:
+#    enabled: true
+#    clients: server-provider, server-provider2
