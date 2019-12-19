@@ -16,4 +16,19 @@ public class HelloController {
     public String customFilter(@RequestParam String name, HttpServletRequest request) {
         return "customFilter, " + name + "!"+request.getServerPort();
     }
+
+    @GetMapping(value = "/v1")
+    public String v1() {
+        return "v1";
+    }
+
+    @GetMapping(value = "/v2")
+    public String v2() {
+        return "v2";
+    }
+
+    @GetMapping("/rateLimit")
+    public String hello() {
+        return "Hello, spring cloud Gateway";
+    }
 }

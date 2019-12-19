@@ -1,6 +1,7 @@
 package com.example.gateway;
 
 import com.example.gateway.filter.CustomGatewayFilter;
+import com.example.gateway.filter.GatewayRateLimitFilterByIp;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
@@ -9,6 +10,8 @@ import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestTemplate;
+
+import java.time.Duration;
 
 @SpringBootApplication
 public class GatewayApplication {
@@ -137,23 +140,6 @@ public class GatewayApplication {
 //                .build();
 //    }
 
-    @Bean
-    public RouteLocator customerRouteLocator(RouteLocatorBuilder builder) {
-        return builder.routes()
-                .route(r -> r.path("/test/**")
-                                .filters(f -> f.addRequestParameter("name","QwQ")
-                                        .rewritePath("/test/(?<segment>.*)","/$\\{segment}")
-                                        .filter(new CustomGatewayFilter()))
-
-//                        .filters(f -> f.filter(new CustomGatewayFilter()))    //
-//                                .uri("http://localhost:8090")
-                                .uri("lb://server-provider")
-                                .order(0)
-                                .id("custom_filter")
-                )
-                .build();
-    }
-
 //    @Bean
 //    public RouteLocator customerRouteLocator(RouteLocatorBuilder builder) {
 //        return builder.routes()
@@ -163,11 +149,23 @@ public class GatewayApplication {
 //                                        .filter(new CustomGatewayFilter()))
 //
 ////                        .filters(f -> f.filter(new CustomGatewayFilter()))    //
-//                                .uri("lb://server-provider")
+//                                .uri("http://localhost:8090")
+////                                .uri("lb://server-provider")//搭配eureka使用負載均衡
 //                                .order(0)
 //                                .id("custom_filter")
 //                )
 //                .build();
 //    }
+
+    @Bean
+    public RouteLocator customerRouteLocator(RouteLocatorBuilder builder) {
+        return builder.routes()
+                .route(r -> r.path("/test/**")
+                        .filters(f -> f.filter(new GatewayRateLimitFilterByIp(3,1, Duration.ofSeconds(1)))
+                                .rewritePath("/test/(?<segment>.*)","/$\\{segment}"))
+                        .uri("http://localhost:8090/")
+                        .id("rateLimit_route")
+                ).build();
+    }
 
 }
